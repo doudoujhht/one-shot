@@ -368,6 +368,7 @@
 
   var SUPABASE_URL = "https://euxqmnrosiizcoqbgarl.supabase.co";
   var SUPABASE_KEY = "sb_publishable_qr3qWvljbnf7pMGH4R06_g_nHrdfv_v";
+  var HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY };
 
   var sheets = [].slice.call(document.querySelectorAll(".sheet"));
   var letters = sheets.filter(function(s){ return s.dataset.id; });
@@ -381,21 +382,17 @@
     set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
   };
 
+  // Every save appends a new row, so the database keeps every version.
   function saveRemote(id, title, body){
     return fetch(SUPABASE_URL + "/rest/v1/reponses", {
       method: "POST",
       headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
         "Content-Type": "application/json",
-        "Prefer": "return=minimal"
+        Prefer: "return=minimal"
       },
-      body: JSON.stringify({
-        kind: "section",
-        section: id,
-        section_title: title,
-        content: body
-      }),
+      body: JSON.stringify({ kind: "section", section: id, section_title: title, content: body }),
       keepalive: true
     }).then(function(res){
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -403,7 +400,25 @@
     });
   }
 
-  // Build the cover index.
+  // The view returns only the most recent version of each answer.
+  function loadRemote(){
+    return fetch(SUPABASE_URL + "/rest/v1/latest_answers?select=section,content", { headers: HEADERS })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        rows.forEach(function(row){
+          var ta = document.getElementById("ta-" + row.section);
+          if (!ta || ta._dirty) return;           // never overwrite what she is typing
+          var body = row.content == null ? "" : row.content;
+          ta.value = body;
+          ta._lastSent = body;
+          store.set("ans-" + row.section, body);
+        });
+        paint();
+        if (current === LAST) buildRecap();
+      })
+      .catch(function(){ /* offline: the local copy already showing is fine */ });
+  }
+
   letters.forEach(function(sheet, i){
     var li = document.createElement("li");
     li.innerHTML =
@@ -416,11 +431,8 @@
     index.appendChild(li);
   });
 
-  // Build a reply panel under each letter section.
   letters.forEach(function(sheet){
-    var id = sheet.dataset.id;
-    var title = sheet.dataset.title;
-    var key = "ans-" + id;
+    var id = sheet.dataset.id, title = sheet.dataset.title, key = "ans-" + id;
 
     var panel = document.createElement("div");
     panel.className = "reply";
@@ -436,8 +448,10 @@
     var st = panel.querySelector(".status");
     ta.setAttribute("aria-label", "Your reply to " + title);
     ta.value = store.get(key);
+    ta._lastSent = ta.value;
+    ta._dirty = false;
 
-    var timer, lastSent = ta.value, pending = false;
+    var timer;
 
     function flash(msg, warn){
       st.textContent = msg;
@@ -448,29 +462,27 @@
 
     function push(){
       var body = ta.value;
-      if (body === lastSent) return;
-      lastSent = body;
-      pending = false;
-      st.textContent = "Saving…";
+      if (body === ta._lastSent) return;
+      ta._lastSent = body;
+      st.textContent = "Saving\u2026";
       st.className = "status show";
       saveRemote(id, title, body).then(function(){
         flash("Saved");
       }).catch(function(){
-        lastSent = null;
+        ta._lastSent = null;
         flash("Saved on this device", true);
       });
     }
 
     ta.addEventListener("input", function(){
+      ta._dirty = true;
       store.set(key, ta.value);
-      pending = true;
       paint();
       clearTimeout(timer);
       timer = setTimeout(push, 1800);
     });
-
     ta.addEventListener("blur", function(){ clearTimeout(timer); push(); });
-    sheet._flush = function(){ if (pending) { clearTimeout(timer); push(); } };
+    sheet._flush = function(){ clearTimeout(timer); push(); };
   });
 
   function answered(id){ return store.get("ans-" + id).trim().length > 0; }
@@ -548,7 +560,6 @@
     if (s && s._flush) s._flush();
   });
 
-  // Give every letter section a Back / Next row.
   sheets.forEach(function(sheet, i){
     if (i === 0 || i === LAST) return;
     var nav = document.createElement("div");
@@ -561,6 +572,7 @@
   });
 
   paint();
+  loadRemote();
 })();
 </script>
 </body>
