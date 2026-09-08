@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>All in One Shot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap">
+<style>
+  :root{
+    --ground:#0C0E13;
+    --raised:#141821;
+    --well:#10141C;
+    --ink:#EFE9DC;
+    --ink-soft:#9AA2B1;
+    --ink-faint:#69707E;
+    --accent:#E9B368;
+    --accent-deep:#C08D46;
+    --accent-wash:rgba(233,179,104,.10);
+    --line:#1E2430;
+    --line-soft:#171C25;
+    --display:"Fraunces",Georgia,serif;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --sans:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:18.5px;
+    font-weight:300;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* lamplight */
+  body::before{
+    content:"";
+    position:fixed; inset:0 0 auto; height:70vh;
+    background:radial-gradient(70% 55% at 50% -8%, rgba(233,179,104,.10), transparent 70%);
+    pointer-events:none; z-index:0;
+  }
+
+  .rail{
+    position:sticky; top:0; z-index:20;
+    display:flex; gap:4px;
+    padding:15px 22px 14px;
+    background:rgba(12,14,19,.86);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .seg{
+    flex:1; height:2px; border-radius:2px;
+    background:#2A313E; border:0; padding:0; cursor:pointer;
+    transition:background .3s ease, transform .3s ease;
+    transform-origin:center;
+  }
+  .seg:hover{background:var(--ink-faint)}
+  .seg.done{background:var(--accent-deep)}
+  .seg.here{background:var(--accent);transform:scaleY(2)}
+  .seg:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+
+  .wrap{position:relative;z-index:1;max-width:40rem;margin:0 auto;padding:60px 24px 100px}
+
+  .eyebrow{
+    font-family:var(--sans);
+    font-size:11px; font-weight:600;
+    letter-spacing:.2em; text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 26px;
+  }
+
+  h1{
+    font-family:var(--display);
+    font-optical-sizing:auto;
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+    font-weight:300; font-style:italic;
+    font-size:clamp(46px,13vw,84px);
+    line-height:.98; letter-spacing:-.028em;
+    text-wrap:balance;
+    margin:0 0 26px;
+  }
+  .lede{
+    font-size:20.5px; line-height:1.62;
+    color:var(--ink-soft); font-weight:300;
+    margin:0;
+  }
+
+  .ord{
+    font-family:var(--display);
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+    font-style:italic; font-weight:300;
+    font-size:clamp(72px,20vw,124px);
+    line-height:.8;
+    color:var(--accent);
+    opacity:.17;
+    letter-spacing:-.04em;
+    margin:0 0 6px -4px;
+    user-select:none;
+  }
+  h2{
+    font-family:var(--display);
+    font-optical-sizing:auto;
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+    font-weight:300; font-style:italic;
+    font-size:clamp(36px,9vw,54px);
+    line-height:1.04; letter-spacing:-.024em;
+    text-wrap:balance;
+    margin:0 0 36px;
+  }
+
+  .prose p{margin:0 0 1.4em}
+  .prose p:last-child{margin-bottom:0}
+  .prose > p:first-child::first-letter{
+    font-family:var(--display);
+    font-variation-settings:"SOFT" 40,"WONK" 1;
+    font-style:italic; font-weight:300;
+    float:left;
+    font-size:4.1em;
+    line-height:.82;
+    padding:.06em .09em 0 0;
+    color:var(--accent);
+  }
+
+  .index{
+    list-style:none; margin:44px 0 0; padding:0;
+    border-top:1px solid var(--line);
+  }
+  .index li{border-bottom:1px solid var(--line-soft)}
+  .index button{
+    display:flex; align-items:baseline; gap:16px;
+    width:100%; text-align:left;
+    background:none; border:0; cursor:pointer;
+    padding:14px 2px; color:var(--ink);
+    transition:color .2s ease, padding-left .2s ease;
+  }
+  .index button:hover{color:var(--accent);padding-left:8px}
+  .index button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .index .n{
+    font-family:var(--sans); font-size:10.5px; font-weight:600;
+    letter-spacing:.12em; color:var(--ink-faint);
+    font-variant-numeric:tabular-nums; flex:none; width:1.5rem;
+  }
+  .index .t{
+    font-family:var(--display); font-style:italic; font-weight:300;
+    font-size:22px; letter-spacing:-.01em;
+  }
+  .index .tick{margin-left:auto;color:var(--accent);opacity:0;font-size:14px;transition:opacity .25s ease}
+  .index .tick.on{opacity:1}
+
+  .sheet{animation:rise .55s cubic-bezier(.22,1,.36,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .reply{
+    margin-top:52px;
+    border-left:2px solid var(--accent);
+    background:linear-gradient(90deg, var(--accent-wash), transparent 62%);
+    padding:22px 0 20px 22px;
+  }
+  .reply-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; margin-bottom:14px;
+  }
+  .reply-label{
+    font-family:var(--sans); font-size:11px; font-weight:600;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--accent);
+  }
+  .status{
+    font-family:var(--sans); font-size:11.5px; font-weight:500;
+    color:var(--ink-faint);
+    opacity:0; transition:opacity .3s ease;
+  }
+  .status.show{opacity:1}
+  .status.warn{color:var(--accent-deep)}
+
+  textarea{
+    display:block; width:100%; min-height:150px; resize:vertical;
+    background:var(--well);
+    color:var(--ink);
+    font-family:var(--serif); font-weight:300;
+    font-size:18px; line-height:1.66;
+    border:1px solid var(--line); border-radius:2px;
+    padding:15px 16px;
+  }
+  textarea::placeholder{color:var(--ink-faint);font-style:italic}
+  textarea:focus{outline:none;border-color:var(--accent-deep);box-shadow:0 0 0 3px var(--accent-wash)}
+
+  .nav{
+    display:flex; gap:10px; align-items:center;
+    margin-top:44px; padding-top:26px;
+    border-top:1px solid var(--line-soft);
+  }
+  .btn{
+    font-family:var(--sans); font-size:14px; font-weight:500;
+    letter-spacing:.01em;
+    padding:12px 22px; border-radius:2px; cursor:pointer;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+    transition:border-color .2s ease, background .2s ease, color .2s ease;
+  }
+  .btn:hover{border-color:var(--ink-faint)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .btn.primary{
+    background:var(--accent); border-color:var(--accent);
+    color:#15100A; font-weight:600;
+  }
+  .btn.primary:hover{background:#F3C583;border-color:#F3C583}
+  .spacer{flex:1}
+
+  .recap{margin-top:40px;border-top:1px solid var(--line);padding-top:8px}
+  .recap-item{padding:20px 0;border-bottom:1px solid var(--line-soft)}
+  .recap-title{
+    font-family:var(--sans); font-size:10.5px; font-weight:600;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
+    margin:0 0 8px;
+  }
+  .recap-body{margin:0;white-space:pre-wrap;color:var(--ink-soft);font-size:17px}
+  .recap-empty{margin:0;color:var(--ink-faint);font-style:italic;font-size:17px}
+
+  .fine{
+    font-family:var(--sans); font-size:12.5px; font-weight:500;
+    line-height:1.65; color:var(--ink-faint); margin:30px 0 0;
+  }
+
+  @media (max-width:560px){
+    body{font-size:18px}
+    .wrap{padding:42px 20px 80px}
+    .reply{padding-left:18px;margin-top:44px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<nav class="rail" id="rail" aria-label="Progress"></nav>
+
+<div class="wrap">
+
+<section class="sheet" data-step="0">
+  <p class="eyebrow">A letter</p>
+  <h1>All in one shot</h1>
+  <p class="lede">Five things I kept not saying, in the order I want you to read them. There's a box under each one to answer in. Everything you write is saved — you can close this and come back whenever.</p>
+  <ol class="index" id="index"></ol>
+  <div class="nav">
+    <div class="spacer"></div>
+    <button class="btn primary" data-go="1">Start reading</button>
+  </div>
+</section>
+
+<section class="sheet" data-step="1" data-id="dream" data-title="My dream" hidden>
+  <p class="ord">01</p>
+  <h2>My dream</h2>
+  <div class="prose">
+    <p>So my actual dream. The business I dream of building is a car club/ car rental company. I want to make something like a club where everyone pays a monthly fee to use the cars in the club.</p>
+    <p>But like, the club, we manage everything about the car like if the car needs an oil change or has to go to the mechanic we come pick it up and drop you something else to drive in the meantime. And you can have different cars whenever you want depending on availability obviously. But like you don't go pick up the cars they get home delivered. Like let's say each Sunday you get a new car that you chose in advance.</p>
+    <p>And since it's a club, the members could chill together, race or just talk about cars. It would be only high end cars in the club. And only rich people in it so it's a great way to network and to not have to manage cars and it's just something I feel like young people would like.</p>
+    <p>A subscription to your car is something I know will come in the future and I would love to have a club like this. But it costs a lot of money tho. And you need connections to rich people and everything but it's my absolute dream business.</p>
+  </div>
+</section>
+
+<section class="sheet" data-step="2" data-id="you" data-title="You" hidden>
+  <p class="ord">02</p>
+  <h2>You</h2>
+  <div class="prose">
+    <p>I drew a blank wsh. What can I say? The state of our relationship is always worrying me. I can't know what you think. Maybe you don't either, mais c'est still worrisome (inquiétant). What am I supposed to do wsh.</p>
+    <p>We are way too in sync these days, it's weird. We are actually so twins every time, but the weird part is that we never have any problems. We are kind and honest with each other. We are making jokes. I actually call you when I want to talk to you. You actually open up to me when you feel bad. Like everything is going super well. Like better than ever. Like we never did that. I even know which Bible you read. It's NKJV btw. Yes I am flexing my memory. Fuck you Mike Ross. Mais ouais.</p>
+    <p>I feel like this is going way too well. Despite that, I still have this uneasy feeling. I don't know if you have it too. We have such a perfect yet fragile relationship. Like we don't have any problems because we are both delicately avoiding anything that could cause one. I remember I asked you to just be honest and like say everything, and I regret that we never actually did it. We should act like there is nothing, forever. I am joking. Well half joking.</p>
+    <p>I also felt like you had questions you wanted to ask. I also had questions I wanted to ask but I feel like maybe ignorance is bliss. I don't know how long we can just avoid talking about important stuff. This is a mental game.</p>
+    <p>I offered for you to ask your questions so I could answer and give you the advantage, but I feel like even then, based on the questions you would ask, I could speculate about what you think. Even so, I would technically still be the one who gave more but I genuinely think this isn't like a game of who has the most information or who wins what.</p>
+    <p>I want to know what you think so I can know what to do. You can see I was very careful about not giving too many details in this, and I wasn't specific to not leak too much information. But as a way to prove my good will, I will talk about something specific.</p>
+    <p>I told you that I wanted you to not be so gloomy about our friendship in saying that it should inevitably end and everything. Well this is important for me because it could decide what I do. I absolutely adore our friendship and especially how it is now and I want to do my best to save it.</p>
+    <p>If you don't think it's worth being saved or that it can be saved then why would I put all my effort in saving something you don't want to save. If you feel like there is no solution then maybe I should stop searching for one and just accept that there is none. I can fight for our friendship but I can't fight against us. If you feel like there is no solution then I would rather know than keep looking for one alone.</p>
+    <p>Also since we are being specific. I am not asking you to find a solution or nothing. I was just asking if you believe a solution can be found. You don't have to answer right away because I don't want it to feel like I forced you and like I said ignorance is bliss sometimes. Maybe it's better, I don't know.</p>
+    <p>But yeah sometimes I ask you questions because what you think can change what I think or what I do. But I know sometimes you don't know what you think and sometimes you want my answer first. That's why I said ask me everything you want to ask. I want you to feel like you know everything you want to know. It can help you find what you think so don't hesitate.</p>
+  </div>
+</section>
+
+<section class="sheet" data-step="3" data-id="instagram" data-title="Instagram" hidden>
+  <p class="ord">03</p>
+  <h2>Instagram</h2>
+  <div class="prose">
+    <p>And also Instagram and other social media played a big role in this. If I redownload Instagram right now I will surely see posts like: «It's a strange thing to be close to someone and still feel easy to let go of» and in the comments everybody would be like I understand and everything. I wouldn't say I understand or that this applies to me. I don't think it's easy for you to let me go. But you kinda understand what type of post I am talking about.</p>
+    <p>I wouldn't stop talking to you because of an IG post, I think that's stupid. I would need at least 3 posts and one story. But like seeing these types of posts once is ok but I am genuinely seeing them every other post.</p>
+    <p>That and guys in the Andrew Tate lane. He is actually the only manosphere influencer I know so they might not be like him but I don't care. Each time I see a post I am not asking myself if the person posting that has a point. Sometimes they do, sometimes they don't, but I don't care.</p>
+    <p>What I care about is myself and the more time I spent on Instagram, the more my algorithm showed me sad things. I feel like every post I was seeing was incredibly sad and it was making me sad myself. I don't see myself in the situation described in the posts but in the comments people were sharing how it happened to them and how sad they are and everything and it affected me wsh. I feel like I could end up like them if I don't take care of myself. And it started to introduce new doubts in my head about my life. Nothing huge but I noticed it and I didn't like it.</p>
+    <p>I deleted the app because I don't need it. I am myself and reading hypotheticals about situations I've never been through isn't healthy. There were fewer funny videos and more videos about people suffering and being hurt emotionally, and it was negative for me.</p>
+    <p>There was also a minority of videos saying women shouldn't have rights because some women supported Lindsay Clancy. Yes this is a real thing. Some people are genuinely saying women shouldn't vote or work because a random woman with mental health problems killed her children. I feel like it's unfortunate what happened to those kids but that's more a crime story than a national event. And I don't like the idea of it being so much on my feed.</p>
+    <p>My Instagram feed quickly became a cesspool of negativity and it was affecting me. Now I still have beeper so people can still dm me on Instagram and send me reels but I deleted the app.</p>
+    <p>The first time I felt my ig algorithm change because of you was tinder. I have never used a dating site in my life, never even searched it up. But after we talked about how Bradley would go on dating sites, I was bombarded with ads and posts about Tinder and bumble and whatever.</p>
+    <p>That was funny tho. Then you talked about a comedy show and I never went to a comedy show besides the one we went to and I never watched comedy shows on Instagram, but after you talked about it I was bombarded by ads from Sugar Sammy.</p>
+    <p>He has a show here on September 11 and 12. Wyatt Feegrado has one on September 11, aka 9/11. His ads are always the sketch about crying at a first date because he was pepper sprayed, always having a boner in middle school so he quit teaching, or playing Jesus on the History Channel, then he is like «hey Montreal, I am coming to your city on 9/11 yes that's right, 9/11 take your ticket and don't miss it».</p>
+    <p>Then there is hassouna, c'est un Arabe qui fait la joke: la police a dit que le suspect avait des troubles mentaux so forcément il est blanc.</p>
+    <p>I know all of these by heart because I literally got spammed with this since you talked about it. Like I never ever saw any ads about this and then in one shot my feed got flooded with that.</p>
+    <p>There was also the ad about the country you are destined to live in. Since I told you about South Korea I got every version of it.</p>
+    <p>But those were ads that were probably extrapolated from my messages, I might sound like a conspiracy theorist right now but I am sure it's because of WhatsApp. It all started when we started using it. My WhatsApp is linked to my 2 ig accounts like it's the same account since everything is owned by Facebook. I swear since we are talking on WhatsApp my feed just radically changed.</p>
+    <p>I think it's because I had deactivated tracking on Instagram, so they couldn't serve me relevant ads. Before that, my ads were always random stuff like some applications, maybe like Claude or ChatGPT, I used to see those a lot, charity things like sending money to Sudan. Just the most random thing ever. I don't remember much beyond that because it was irrelevant and different from my usual feed.</p>
+    <p>Now it goes by wave. There could be a week where it's tinder and then I will have any type of dating app imaginable, I got an ad for a dating app for Jewish people. I am black. Then it was comedy shows and like every swipe there was a new comedian coming to Montreal soon or a new comedian from mtl going to France soon.</p>
+    <p>My regular feed became like that but more gradually: the funny videos appeared less and less and the other videos popped up more. My algorithm was basically 40% funny videos, 15% soccer, 15% clothes, 20% music and 10% others. Now I feel like videos about sad things and Lindsay Clancy are at least 35%.</p>
+  </div>
+</section>
+
+<section class="sheet" data-step="4" data-id="money" data-title="My money treeeeee" hidden>
+  <p class="ord">04</p>
+  <h2>My money treeeeee</h2>
+  <div class="prose">
+    <p>Now why you are my personal money tree. As you know I don't have a job. I usually do whatever I feel is useful. I know it sounds easy but it's not. It's not like a job where you come in the morning, do what you are asked to, and leave at 5. It's pretty hard. I always have to think about what to do.</p>
+    <p>There is also a lot of failure. It's actually part of the process. I could send 20 emails one day and get one response and that response can end up not working with us. I can do a week where nothing works.</p>
+    <p>But whatever happens you still believe in me. Sometimes I actually wish someone would believe in me like you believe in me. I know it sounds stupid because you literally do but it still feels so crazy wsh. I actually sometimes work to not disappoint you. I want to show you that you are right for believing in me.</p>
+    <p>There is also the biggest thing: the mental aspect. Doing what I do is mentally taxing sometimes. You have always helped me feel better mentally. And even without helping me you being there is enough. It's about a sense of security. I know that if I try something and it ends up affecting me, you will help me get through it. I know that I can just text you and you will help me with whatever is troubling me.</p>
+    <p>I would say the most important thing for me to make money is my mental state. When I feel good, feel like working I can actually do important stuff, sign clients and make money. When I feel bad I just feel like staying in bed and doing nothing.</p>
+    <p>I missed you because you have this thing where you understand me and you genuinely want me to feel better. I am so grateful and happy to know you wsh. You have that thing to help me focus on stuff and be less distracted. This is actually why I am really happy about how we are now because when you have a problem, you reach out to me and we talk about it.</p>
+    <p>I know the effects of this aren't really visible right now but one day you will see that feeling like there is someone you could reach out to in case of need gives you the courage to do what you would never have done. And sometimes doing these things pays a lot. In any case. You make me happy and happy me = making more money.</p>
+    <p>In the past I also worked a lot so you wouldn't think I am a bum, unemployed, with no wife, no GLC, no CLE. I used to want you to be proud of me. Now I don't know what I want tho. Well I now want 2 Benz. I am joking tho. I don't know what I want. I know that I started the business with my dad because I know you are one text away if this becomes too much.</p>
+    <p>I am actually someone who literally just needs to be understood. I don't even ask for that much. You understand me and you push me to do better so obviously I do better. When you weren't there, first I missed you. And second I didn't have the mental support you gave me.</p>
+    <p>It's like imagine playing Fortnite and you have a friend who has a full medkit and a big potion. You can play the game more calmly and maybe even stay a bit in the storm to get a better position because you know your friend can just throw a medkit. You get full again, so you can go and rush more.</p>
+    <p>Now imagine your friend is the medkit. That's what you are. You give me the confidence to try because I know you will be there in case it doesn't work out. That's why I told you about my business. Because I believe in you and your ability to help me. You are my medkit in a way. More like a chug jug tho.</p>
+    <p>I know you are still a person and like you have your own things to do besides being my chug jug. Sorry for calling you a chug jug tho. You deserve your peace, and I know what I ask from you isn't peace. I haven't had any problems in the business yet, but I know if it happens I would need you.</p>
+    <p>I am genuinely trying to find another way. A way to not rely on you. I feel like I am unfair to you sometimes, I am always asking so much from you. Because you are always ready to help but I know I shouldn't abuse your kindness.</p>
+    <p>I don't know what to explain more. You give me a sense of security and you believing in me makes me feel like I can do it. I still think I shouldn't rely on you for that since you also have your life to manage and I am trying to find solutions to make everyone happy: me feeling better without you having to encourage me.</p>
+    <p>I feel like there is no solution, I am someone who just needs a best friend. If it's not you it would have to be someone else, and I don't see who. I don't think I can do it by myself. And I am not trying to replace you hein. Well maybe on this but it's because I feel like this is too much to ask you. I don't doubt you can do this, I just don't want this to feel like a burden to you.</p>
+    <p>I feel like saying you are my chug jug is not dehumanising because you are a lot more than that but in this specific context of why you push me to work hard it's because you believe in me and you can make me feel better when I am low and I always reach low points when doing important things. They always say your circle is essential to your success and I feel like in my current life you are that circle. When successful people do interviews and they are like this is big Mike, it's thanks to him all of this, I didn't want to do this at first but he pushed. If I succeed one day I feel like you would be my big Mike.</p>
+    <p>I know I asked about finding someone else but you are the best support I could wish for. In every aspect of my life you are the best I could wish for. I don't have anything more to ask so I don't know how to replace you. Who would I replace you with?</p>
+  </div>
+</section>
+
+<section class="sheet" data-step="5" data-id="suite" data-title="La suite" hidden>
+  <p class="ord">05</p>
+  <h2>La suite</h2>
+  <div class="prose">
+    <p>I also feel like you would not like it if I stopped talking to you about my personal stuff and relying on you. I think you wouldn't like it if we had a more normal friendship, yet you always insist that our friendship should end one day. On this too I am genuinely lost. On one hand you want me to tell you everything and rely on you and on the other hand you are saying that our friendship is surely doomed. I feel like there isn't a single good option for me.</p>
+    <p>On one hand I could just tell you everything and rely on you just like before. But let me ask you this: would you trust your most important emotions and feelings to someone who keeps telling me this friendship is going to end one day? This isn't an attack on you, I genuinely enjoy our friendship and I understand why you always say that. But I feel like you can understand why I am scared of telling you how I truly feel. That asks me to be vulnerable with you and I don't know if it's a good idea to do it with someone who is there until she is not. I hope you understand what I mean. I am not saying you are wrong for saying that our friendship should end one day, I understand where you are coming from and you are free to think what you want, but I hope you also understand how it affects what I think.</p>
+    <p>On the other hand I could decide to not go this far in talking about my feelings. But well it's still not a win for me because I genuinely need someone to talk to and besides you I have no one to do that with. And I know you. It would make you sad if you saw me feeling bad but couldn't help me and in turn I hate seeing you feeling bad so I would feel bad too. whatever I do, it sucks. That could summarize my whole year I think.</p>
+    <p>You are someone I trust. I want your opinion, what should I do? And I think we are well past the «it's not my place to say ». Just say it. Just because a decision is hard doesn't mean one option isn't better than the other.</p>
+    <p>As you can see this message went everywhere and I even forgot the main topic. I feel like this is one of the subjects we tried to avoid. I would have avoided it forever and made the decision myself but you can tell when I feel bad and you will surely ask me to talk about this in the future la. I also don't want any drama between us. If you feel like your answer could cause drama, I authorize you to act like you haven't seen a thing and just ignore the question.</p>
+    <p>That's it I think. I could go on more but I think this is already something I avoided talking about, we can't talk about everything in one shot. Also I like how we are now even if it's based on us avoiding saying important things. I feel like being honest with each other could make this even better but it could also make it worse. I don't know what you think and you don't know what I think so like let's do it slowly and if we feel like being honest will be negative let's continue to live like this wsh. Until we are ready. Well finishhhhhed.</p>
+  </div>
+</section>
+
+<section class="sheet" data-step="6" hidden>
+  <p class="eyebrow">The end</p>
+  <h2>Voilà</h2>
+  <div class="prose">
+    <p class="lede">That's all five. Everything you wrote is saved here — I'll read it. You can come back and change any of it whenever you want.</p>
+  </div>
+  <div class="recap" id="recap"></div>
+  <div class="nav">
+    <button class="btn" data-go="1">Read it again</button>
+    <div class="spacer"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = "https://euxqmnrosiizcoqbgarl.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_qr3qWvljbnf7pMGH4R06_g_nHrdfv_v";
+
+  var sheets = [].slice.call(document.querySelectorAll(".sheet"));
+  var letters = sheets.filter(function(s){ return s.dataset.id; });
+  var LAST = sheets.length - 1;
+  var rail = document.getElementById("rail");
+  var index = document.getElementById("index");
+  var current = 0;
+
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+
+  function saveRemote(id, title, body){
+    return fetch(SUPABASE_URL + "/rest/v1/reponses", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        kind: "section",
+        section: id,
+        section_title: title,
+        content: body
+      }),
+      keepalive: true
+    }).then(function(res){
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return true;
+    });
+  }
+
+  // Build the cover index.
+  letters.forEach(function(sheet, i){
+    var li = document.createElement("li");
+    li.innerHTML =
+      '<button type="button" data-go="' + (i+1) + '">' +
+        '<span class="n">0' + (i+1) + '</span>' +
+        '<span class="t"></span>' +
+        '<span class="tick" id="tick-' + sheet.dataset.id + '">answered</span>' +
+      "</button>";
+    li.querySelector(".t").textContent = sheet.dataset.title;
+    index.appendChild(li);
+  });
+
+  // Build a reply panel under each letter section.
+  letters.forEach(function(sheet){
+    var id = sheet.dataset.id;
+    var title = sheet.dataset.title;
+    var key = "ans-" + id;
+
+    var panel = document.createElement("div");
+    panel.className = "reply";
+    panel.innerHTML =
+      '<div class="reply-head">' +
+        '<span class="reply-label">Your reply</span>' +
+        '<span class="status" id="st-' + id + '"></span>' +
+      "</div>" +
+      '<textarea id="ta-' + id + '" placeholder="Take your time."></textarea>';
+    sheet.appendChild(panel);
+
+    var ta = panel.querySelector("textarea");
+    var st = panel.querySelector(".status");
+    ta.setAttribute("aria-label", "Your reply to " + title);
+    ta.value = store.get(key);
+
+    var timer, lastSent = ta.value, pending = false;
+
+    function flash(msg, warn){
+      st.textContent = msg;
+      st.className = "status show" + (warn ? " warn" : "");
+      clearTimeout(st._t);
+      st._t = setTimeout(function(){ st.className = "status"; }, 2600);
+    }
+
+    function push(){
+      var body = ta.value;
+      if (body === lastSent) return;
+      lastSent = body;
+      pending = false;
+      st.textContent = "Saving…";
+      st.className = "status show";
+      saveRemote(id, title, body).then(function(){
+        flash("Saved");
+      }).catch(function(){
+        lastSent = null;
+        flash("Saved on this device", true);
+      });
+    }
+
+    ta.addEventListener("input", function(){
+      store.set(key, ta.value);
+      pending = true;
+      paint();
+      clearTimeout(timer);
+      timer = setTimeout(push, 1800);
+    });
+
+    ta.addEventListener("blur", function(){ clearTimeout(timer); push(); });
+    sheet._flush = function(){ if (pending) { clearTimeout(timer); push(); } };
+  });
+
+  function answered(id){ return store.get("ans-" + id).trim().length > 0; }
+
+  function paint(){
+    rail.innerHTML = "";
+    letters.forEach(function(sheet, i){
+      var step = i + 1;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "seg" + (step === current ? " here" : (answered(sheet.dataset.id) ? " done" : ""));
+      b.title = sheet.dataset.title;
+      b.setAttribute("aria-label", "Go to " + sheet.dataset.title);
+      b.addEventListener("click", function(){ go(step); });
+      rail.appendChild(b);
+
+      var tick = document.getElementById("tick-" + sheet.dataset.id);
+      if (tick) tick.className = "tick" + (answered(sheet.dataset.id) ? " on" : "");
+    });
+  }
+
+  function buildRecap(){
+    var box = document.getElementById("recap");
+    box.innerHTML = "";
+    var any = false;
+    letters.forEach(function(sheet){
+      var body = store.get("ans-" + sheet.dataset.id).trim();
+      if (!body) return;
+      any = true;
+      var item = document.createElement("div");
+      item.className = "recap-item";
+      item.innerHTML = '<p class="recap-title"></p><p class="recap-body"></p>';
+      item.querySelector(".recap-title").textContent = sheet.dataset.title;
+      item.querySelector(".recap-body").textContent = body;
+      box.appendChild(item);
+    });
+    if (!any){
+      var p = document.createElement("p");
+      p.className = "recap-empty";
+      p.textContent = "You haven't written anything yet. Go back whenever you feel like it.";
+      box.appendChild(p);
+    }
+  }
+
+  function go(step){
+    var leaving = sheets[current];
+    if (leaving && leaving._flush) leaving._flush();
+
+    current = step;
+    sheets.forEach(function(s, i){ s.hidden = i !== step; });
+
+    var shown = sheets[step];
+    shown.classList.remove("sheet");
+    void shown.offsetWidth;
+    shown.classList.add("sheet");
+
+    if (step === LAST) buildRecap();
+    paint();
+    window.scrollTo(0, 0);
+  }
+
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-go]");
+    if (t) go(Number(t.getAttribute("data-go")));
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "TEXTAREA") return;
+    if (e.key === "ArrowRight" && current < LAST) go(current + 1);
+    if (e.key === "ArrowLeft" && current > 0) go(current - 1);
+  });
+
+  window.addEventListener("pagehide", function(){
+    var s = sheets[current];
+    if (s && s._flush) s._flush();
+  });
+
+  // Give every letter section a Back / Next row.
+  sheets.forEach(function(sheet, i){
+    if (i === 0 || i === LAST) return;
+    var nav = document.createElement("div");
+    nav.className = "nav";
+    nav.innerHTML =
+      (i > 1 ? '<button class="btn" data-go="' + (i-1) + '">Back</button>' : "") +
+      '<div class="spacer"></div>' +
+      '<button class="btn primary" data-go="' + (i+1) + '">' + (i === LAST-1 ? "Finish" : "Next") + "</button>";
+    sheet.appendChild(nav);
+  });
+
+  paint();
+})();
+</script>
+</body>
+</html>
