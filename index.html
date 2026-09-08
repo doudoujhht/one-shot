@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<title>All in One Shot</title>
+<title>Not all in one shot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Nunito:ital,wght@0,500;0,600;0,700;0,800&display=swap">
@@ -359,8 +359,7 @@
 
 <section class="sheet" data-step="0">
   <p class="eyebrow">A letter</p>
-  <h1>All in one shot</h1>
-  <p class="lede">Five things I kept not saying, in the order I want you to read them. There's a box under each one to answer in. Everything you write is saved — you can close this and come back whenever.</p>
+  <h1>Not all in one shot</h1>
   <ol class="index" id="index"></ol>
   <div class="nav">
     <div class="spacer"></div>
@@ -516,8 +515,36 @@
     var n = parseInt(store.get("ks-unlocked"), 10);
     return (n >= 1 && n <= LAST) ? n : 1;
   })();
-  function unlock(step){ if (step > unlocked){ unlocked = step; store.set("ks-unlocked", String(step)); } }
+  function unlock(step){
+    if (step > unlocked){
+      unlocked = step;
+      store.set("ks-unlocked", String(step));
+      pushProgress(step);
+    }
+  }
   function canAccess(step){ return step === 0 || step <= unlocked; }
+
+  // Progress is shared in one row so it follows her across devices. The
+  // "unlocked=lt.N" guard means a write can only move it forward, so a stale
+  // device can never roll her back.
+  function pushProgress(n){
+    fetch(SUPABASE_URL + "/rest/v1/reader_state?id=eq.reader&unlocked=lt." + n, {
+      method: "PATCH",
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ unlocked: n }),
+      keepalive: true
+    }).catch(function(){});
+  }
+  function loadProgress(){
+    return fetch(SUPABASE_URL + "/rest/v1/reader_state?select=unlocked&id=eq.reader", { headers: HEADERS })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        var remote = (rows && rows[0]) ? parseInt(rows[0].unlocked, 10) : 0;
+        if (remote > unlocked){ unlocked = remote; store.set("ks-unlocked", String(remote)); paint(); }
+        else if (unlocked > remote){ pushProgress(unlocked); }   // this device is ahead
+      })
+      .catch(function(){ /* offline: local progress still applies */ });
+  }
 
   // A per-tab id so edit events from different devices/sessions stay separable.
   var SESSION = (function(){
@@ -822,6 +849,7 @@
 
   paint();
   loadRemote();
+  loadProgress();
 })();
 </script>
 </body>
