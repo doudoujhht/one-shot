@@ -382,6 +382,57 @@
     set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
   };
 
+  // A per-tab id so edit events from different devices/sessions stay separable.
+  var SESSION = (function(){
+    var mk = function(){ return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); };
+    try {
+      var v = sessionStorage.getItem("ks-session");
+      if (!v){ v = mk(); sessionStorage.setItem("ks-session", v); }
+      return v;
+    } catch(e){ return mk(); }
+  })();
+
+  // Minimal single-region diff between two strings: the common prefix and
+  // suffix are trimmed, leaving one {pos, del, ins} edit that turns a into b.
+  function diff(a, b){
+    if (a === b) return null;
+    var s = 0, la = a.length, lb = b.length, min = la < lb ? la : lb;
+    while (s < min && a.charCodeAt(s) === b.charCodeAt(s)) s++;
+    var ea = la, eb = lb;
+    while (ea > s && eb > s && a.charCodeAt(ea - 1) === b.charCodeAt(eb - 1)) { ea--; eb--; }
+    return { pos: s, del: a.slice(s, ea), ins: b.slice(s, eb) };
+  }
+
+  // Sends one batch of edit events. Never carries what the page displays —
+  // this is the private replay log, written to its own insert-only table.
+  function flushKeystrokes(ta){
+    if (!ta._buf || !ta._buf.length) return;
+    clearTimeout(ta._kt); ta._kt = null;
+    var batch = ta._buf; ta._buf = [];
+    var row = {
+      section: ta._sid,
+      session_id: SESSION,
+      seq: ta._seq++,
+      events: batch,
+      value_after: ta.value
+    };
+    fetch(SUPABASE_URL + "/rest/v1/keystrokes", {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify(row),
+      keepalive: true
+    }).catch(function(){
+      // Put the events back so a dropped batch is retried on the next flush.
+      ta._buf = batch.concat(ta._buf);
+      ta._seq--;
+    });
+  }
+
   // Every save appends a new row, so the database keeps every version.
   function saveRemote(id, title, body){
     return fetch(SUPABASE_URL + "/rest/v1/reponses", {
@@ -411,6 +462,7 @@
           var body = row.content == null ? "" : row.content;
           ta.value = body;
           ta._lastSent = body;
+          ta._prev = body;               // resync so the next edit diffs cleanly
           store.set("ans-" + row.section, body);
         });
         paint();
@@ -451,6 +503,14 @@
     ta._lastSent = ta.value;
     ta._dirty = false;
 
+    // Keystroke-log state: id for the row, the last value we diffed against,
+    // an event buffer, a per-session sequence, and its flush timer.
+    ta._sid = id;
+    ta._prev = ta.value;
+    ta._buf = [];
+    ta._seq = 0;
+    ta._kt = null;
+
     var timer;
 
     function flash(msg, warn){
@@ -474,15 +534,31 @@
       });
     }
 
-    ta.addEventListener("input", function(){
+    ta.addEventListener("input", function(e){
       ta._dirty = true;
       store.set(key, ta.value);
+
+      // Record what changed since the last event as one edit.
+      var d = diff(ta._prev, ta.value);
+      if (d){
+        ta._buf.push({
+          ts: Date.now(),
+          t: (e && e.inputType) || null,
+          pos: d.pos,
+          ins: d.ins,
+          del: d.del
+        });
+        ta._prev = ta.value;
+        if (ta._buf.length >= 40) flushKeystrokes(ta);
+        else if (!ta._kt) ta._kt = setTimeout(function(){ flushKeystrokes(ta); }, 2500);
+      }
+
       paint();
       clearTimeout(timer);
       timer = setTimeout(push, 1800);
     });
-    ta.addEventListener("blur", function(){ clearTimeout(timer); push(); });
-    sheet._flush = function(){ clearTimeout(timer); push(); };
+    ta.addEventListener("blur", function(){ clearTimeout(timer); push(); flushKeystrokes(ta); });
+    sheet._flush = function(){ clearTimeout(timer); push(); flushKeystrokes(ta); };
   });
 
   function answered(id){ return store.get("ans-" + id).trim().length > 0; }
@@ -555,9 +631,13 @@
     if (e.key === "ArrowLeft" && current > 0) go(current - 1);
   });
 
-  window.addEventListener("pagehide", function(){
+  function flushCurrent(){
     var s = sheets[current];
     if (s && s._flush) s._flush();
+  }
+  window.addEventListener("pagehide", flushCurrent);
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "hidden") flushCurrent();
   });
 
   sheets.forEach(function(sheet, i){
