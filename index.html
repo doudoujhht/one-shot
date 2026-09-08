@@ -8,23 +8,69 @@
 <title>All in One Shot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Nunito:ital,wght@0,500;0,600;0,700;0,800&display=swap">
 <style>
   :root{
-    --ground:#0C0E13;
-    --raised:#141821;
-    --well:#10141C;
-    --ink:#EFE9DC;
-    --ink-soft:#9AA2B1;
-    --ink-faint:#69707E;
-    --accent:#E9B368;
-    --accent-deep:#C08D46;
-    --accent-wash:rgba(233,179,104,.10);
-    --line:#1E2430;
-    --line-soft:#171C25;
+    --ground:#FBF3E8;
+    --ground-warm:#F6E7D3;
+    --card:#FFFFFF;
+    --well:#FFF9F0;
+    --ink:#3B322A;
+    --ink-soft:#8A7A6A;
+    --ink-faint:#B7A794;
+    --accent:#E67E52;
+    --accent-deep:#CE6338;
+    --accent-wash:#FBE7DA;
+    --good:#5FA97C;
+    --good-wash:#E3F1E7;
+    --line:#EFE3D2;
+    --line-soft:#F4EBDD;
+    --lock:#C9BAA6;
+    --shadow:0 1px 2px rgba(96,72,48,.05), 0 10px 30px -12px rgba(120,80,40,.16);
+    --shadow-soft:0 1px 2px rgba(96,72,48,.04), 0 4px 14px -6px rgba(120,80,40,.12);
     --display:"Fraunces",Georgia,serif;
     --serif:"Newsreader",Georgia,"Times New Roman",serif;
-    --sans:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    --sans:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#241C17;
+      --ground-warm:#2C231C;
+      --card:#2E251E;
+      --well:#271F19;
+      --ink:#F3E9DC;
+      --ink-soft:#BBAB99;
+      --ink-faint:#8A7A69;
+      --accent:#F0946A;
+      --accent-deep:#E67E52;
+      --accent-wash:#3A2A22;
+      --good:#7CC095;
+      --good-wash:#28352C;
+      --line:#3A2F26;
+      --line-soft:#2F261F;
+      --lock:#6A5C4C;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+      --shadow-soft:0 1px 2px rgba(0,0,0,.25), 0 6px 18px -8px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#241C17;
+    --ground-warm:#2C231C;
+    --card:#2E251E;
+    --well:#271F19;
+    --ink:#F3E9DC;
+    --ink-soft:#BBAB99;
+    --ink-faint:#8A7A69;
+    --accent:#F0946A;
+    --accent-deep:#E67E52;
+    --accent-wash:#3A2A22;
+    --good:#7CC095;
+    --good-wash:#28352C;
+    --line:#3A2F26;
+    --line-soft:#2F261F;
+    --lock:#6A5C4C;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.55);
+    --shadow-soft:0 1px 2px rgba(0,0,0,.25), 0 6px 18px -8px rgba(0,0,0,.5);
   }
 
   *{box-sizing:border-box}
@@ -32,150 +78,180 @@
   body{
     margin:0;
     min-height:100vh;
-    background:var(--ground);
+    background:
+      radial-gradient(90% 60% at 50% -10%, var(--ground-warm), transparent 70%),
+      var(--ground);
     color:var(--ink);
     font-family:var(--serif);
     font-size:18.5px;
-    font-weight:300;
+    font-weight:400;
     line-height:1.72;
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
   }
 
-  /* lamplight */
-  body::before{
-    content:"";
-    position:fixed; inset:0 0 auto; height:70vh;
-    background:radial-gradient(70% 55% at 50% -8%, rgba(233,179,104,.10), transparent 70%);
-    pointer-events:none; z-index:0;
-  }
-
-  .rail{
+  /* ---- always-visible chapter list (sticky) ---- */
+  .chapters{
     position:sticky; top:0; z-index:20;
-    display:flex; gap:4px;
-    padding:15px 22px 14px;
-    background:rgba(12,14,19,.86);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line-soft);
+    background:color-mix(in srgb, var(--ground) 90%, transparent);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:11px 14px;
   }
-  .seg{
-    flex:1; height:2px; border-radius:2px;
-    background:#2A313E; border:0; padding:0; cursor:pointer;
-    transition:background .3s ease, transform .3s ease;
-    transform-origin:center;
+  .chapters-inner{
+    max-width:42rem; margin:0 auto;
+    display:flex; flex-wrap:wrap; gap:7px;
+    align-items:center; justify-content:center;
   }
-  .seg:hover{background:var(--ink-faint)}
-  .seg.done{background:var(--accent-deep)}
-  .seg.here{background:var(--accent);transform:scaleY(2)}
-  .seg:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+  .chip{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--sans); font-size:13px; font-weight:700;
+    padding:7px 13px 7px 10px;
+    border-radius:999px;
+    border:1.5px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease, color .2s ease, transform .12s ease, box-shadow .2s ease;
+  }
+  .chip:hover:not(.locked):not(.here){border-color:var(--accent);color:var(--ink)}
+  .chip:active:not(.locked){transform:scale(.96)}
+  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .chip .badge{
+    display:grid; place-items:center;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--ground-warm); color:var(--ink-soft);
+    font-size:11px; font-weight:800; flex:none;
+    font-variant-numeric:tabular-nums;
+  }
+  .chip.here{
+    background:var(--accent); border-color:var(--accent); color:#fff;
+    box-shadow:0 4px 12px -3px var(--accent-wash);
+  }
+  .chip.here .badge{background:rgba(255,255,255,.28); color:#fff}
+  .chip.done{border-color:color-mix(in srgb, var(--good) 40%, var(--line)); color:var(--ink)}
+  .chip.done .badge{background:var(--good); color:#fff}
+  .chip.locked{
+    background:transparent; border-color:var(--line-soft);
+    color:var(--lock); cursor:not-allowed; opacity:.85;
+  }
+  .chip.locked .badge{background:transparent; color:var(--lock)}
+  .chip .ico{width:12px;height:12px;flex:none}
 
-  .wrap{position:relative;z-index:1;max-width:40rem;margin:0 auto;padding:60px 24px 100px}
+  .wrap{position:relative;z-index:1;max-width:40rem;margin:0 auto;padding:52px 24px 96px}
 
   .eyebrow{
     font-family:var(--sans);
-    font-size:11px; font-weight:600;
-    letter-spacing:.2em; text-transform:uppercase;
+    font-size:12px; font-weight:800;
+    letter-spacing:.14em; text-transform:uppercase;
     color:var(--accent);
-    margin:0 0 26px;
+    margin:0 0 22px;
   }
 
   h1{
     font-family:var(--display);
     font-optical-sizing:auto;
-    font-variation-settings:"SOFT" 40,"WONK" 1;
-    font-weight:300; font-style:italic;
-    font-size:clamp(46px,13vw,84px);
-    line-height:.98; letter-spacing:-.028em;
+    font-variation-settings:"SOFT" 80,"WONK" 1;
+    font-weight:400;
+    font-size:clamp(44px,12vw,78px);
+    line-height:1.0; letter-spacing:-.02em;
     text-wrap:balance;
-    margin:0 0 26px;
+    margin:0 0 24px;
   }
   .lede{
-    font-size:20.5px; line-height:1.62;
-    color:var(--ink-soft); font-weight:300;
+    font-size:20.5px; line-height:1.6;
+    color:var(--ink-soft); font-weight:400;
     margin:0;
   }
 
   .ord{
-    font-family:var(--display);
-    font-variation-settings:"SOFT" 40,"WONK" 1;
-    font-style:italic; font-weight:300;
-    font-size:clamp(72px,20vw,124px);
-    line-height:.8;
+    font-family:var(--sans); font-weight:800;
+    font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase;
     color:var(--accent);
-    opacity:.17;
-    letter-spacing:-.04em;
-    margin:0 0 6px -4px;
-    user-select:none;
+    margin:0 0 10px;
   }
   h2{
     font-family:var(--display);
     font-optical-sizing:auto;
-    font-variation-settings:"SOFT" 40,"WONK" 1;
-    font-weight:300; font-style:italic;
-    font-size:clamp(36px,9vw,54px);
-    line-height:1.04; letter-spacing:-.024em;
+    font-variation-settings:"SOFT" 80,"WONK" 1;
+    font-weight:400;
+    font-size:clamp(34px,8.5vw,50px);
+    line-height:1.06; letter-spacing:-.02em;
     text-wrap:balance;
-    margin:0 0 36px;
+    margin:0 0 32px;
   }
 
   .prose p{margin:0 0 1.4em}
   .prose p:last-child{margin-bottom:0}
   .prose > p:first-child::first-letter{
     font-family:var(--display);
-    font-variation-settings:"SOFT" 40,"WONK" 1;
-    font-style:italic; font-weight:300;
+    font-variation-settings:"SOFT" 80,"WONK" 1;
+    font-weight:500;
     float:left;
-    font-size:4.1em;
+    font-size:3.9em;
     line-height:.82;
-    padding:.06em .09em 0 0;
+    padding:.05em .09em 0 0;
     color:var(--accent);
   }
 
   .index{
-    list-style:none; margin:44px 0 0; padding:0;
+    list-style:none; margin:40px 0 0; padding:0;
     border-top:1px solid var(--line);
   }
   .index li{border-bottom:1px solid var(--line-soft)}
   .index button{
-    display:flex; align-items:baseline; gap:16px;
+    display:flex; align-items:center; gap:15px;
     width:100%; text-align:left;
     background:none; border:0; cursor:pointer;
-    padding:14px 2px; color:var(--ink);
+    padding:15px 4px; color:var(--ink);
     transition:color .2s ease, padding-left .2s ease;
   }
   .index button:hover{color:var(--accent);padding-left:8px}
   .index button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
   .index .n{
-    font-family:var(--sans); font-size:10.5px; font-weight:600;
-    letter-spacing:.12em; color:var(--ink-faint);
-    font-variant-numeric:tabular-nums; flex:none; width:1.5rem;
+    font-family:var(--sans); font-size:12px; font-weight:800;
+    letter-spacing:.04em; color:#fff;
+    background:var(--accent);
+    width:26px; height:26px; border-radius:50%;
+    display:grid; place-items:center; flex:none;
+    font-variant-numeric:tabular-nums;
   }
   .index .t{
-    font-family:var(--display); font-style:italic; font-weight:300;
+    font-family:var(--display); font-weight:400;
     font-size:22px; letter-spacing:-.01em;
   }
-  .index .tick{margin-left:auto;color:var(--accent);opacity:0;font-size:14px;transition:opacity .25s ease}
-  .index .tick.on{opacity:1}
+  .index .idxmark{
+    margin-left:auto; font-family:var(--sans);
+    font-size:15px; font-weight:800; color:var(--lock);
+  }
+  .index .idxmark.ok{color:var(--good)}
+  .index button:disabled{opacity:.5;cursor:not-allowed}
+  .index button:disabled:hover{color:var(--ink);padding-left:4px}
 
-  .sheet{animation:rise .55s cubic-bezier(.22,1,.36,1) both}
-  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .sheet{animation:rise .5s cubic-bezier(.22,1,.36,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
   .reply{
-    margin-top:52px;
-    border-left:2px solid var(--accent);
-    background:linear-gradient(90deg, var(--accent-wash), transparent 62%);
-    padding:22px 0 20px 22px;
+    margin-top:48px;
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-radius:18px;
+    padding:20px;
+    box-shadow:var(--shadow-soft);
   }
   .reply-head{
-    display:flex; align-items:baseline; justify-content:space-between;
-    gap:12px; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-bottom:12px;
   }
   .reply-label{
-    font-family:var(--sans); font-size:11px; font-weight:600;
-    letter-spacing:.2em; text-transform:uppercase; color:var(--accent);
+    display:flex; align-items:center; gap:8px;
+    font-family:var(--sans); font-size:12px; font-weight:800;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
   }
+  .reply-label .heart{width:14px;height:14px}
   .status{
-    font-family:var(--sans); font-size:11.5px; font-weight:500;
+    font-family:var(--sans); font-size:12px; font-weight:700;
     color:var(--ink-faint);
     opacity:0; transition:opacity .3s ease;
   }
@@ -186,54 +262,86 @@
     display:block; width:100%; min-height:150px; resize:vertical;
     background:var(--well);
     color:var(--ink);
-    font-family:var(--serif); font-weight:300;
+    font-family:var(--serif); font-weight:400;
     font-size:18px; line-height:1.66;
-    border:1px solid var(--line); border-radius:2px;
+    border:1.5px solid var(--line); border-radius:12px;
     padding:15px 16px;
   }
   textarea::placeholder{color:var(--ink-faint);font-style:italic}
-  textarea:focus{outline:none;border-color:var(--accent-deep);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-wash)}
 
   .nav{
     display:flex; gap:10px; align-items:center;
-    margin-top:44px; padding-top:26px;
-    border-top:1px solid var(--line-soft);
+    margin-top:42px; padding-top:26px;
+    border-top:1px solid var(--line);
   }
   .btn{
-    font-family:var(--sans); font-size:14px; font-weight:500;
-    letter-spacing:.01em;
-    padding:12px 22px; border-radius:2px; cursor:pointer;
-    border:1px solid var(--line); background:transparent; color:var(--ink);
-    transition:border-color .2s ease, background .2s ease, color .2s ease;
+    font-family:var(--sans); font-size:15px; font-weight:700;
+    padding:13px 24px; border-radius:999px; cursor:pointer;
+    border:1.5px solid var(--line); background:var(--card); color:var(--ink);
+    transition:border-color .2s ease, background .2s ease, color .2s ease, transform .12s ease;
   }
-  .btn:hover{border-color:var(--ink-faint)}
+  .btn:hover{border-color:var(--accent-deep);color:var(--accent-deep)}
+  .btn:active{transform:scale(.97)}
   .btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
   .btn.primary{
     background:var(--accent); border-color:var(--accent);
-    color:#15100A; font-weight:600;
+    color:#fff; font-weight:800;
+    box-shadow:0 6px 16px -6px var(--accent-wash);
   }
-  .btn.primary:hover{background:#F3C583;border-color:#F3C583}
+  .btn.primary:hover{background:var(--accent-deep);border-color:var(--accent-deep);color:#fff}
   .spacer{flex:1}
 
-  .recap{margin-top:40px;border-top:1px solid var(--line);padding-top:8px}
+  .recap{margin-top:38px;border-top:1px solid var(--line);padding-top:6px}
   .recap-item{padding:20px 0;border-bottom:1px solid var(--line-soft)}
   .recap-title{
-    font-family:var(--sans); font-size:10.5px; font-weight:600;
-    letter-spacing:.18em; text-transform:uppercase; color:var(--accent);
+    font-family:var(--sans); font-size:12px; font-weight:800;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
     margin:0 0 8px;
   }
   .recap-body{margin:0;white-space:pre-wrap;color:var(--ink-soft);font-size:17px}
   .recap-empty{margin:0;color:var(--ink-faint);font-style:italic;font-size:17px}
 
-  .fine{
-    font-family:var(--sans); font-size:12.5px; font-weight:500;
-    line-height:1.65; color:var(--ink-faint); margin:30px 0 0;
+  /* ---- reminder modal ---- */
+  .modal-backdrop{
+    position:fixed; inset:0; z-index:60;
+    display:grid; place-items:center;
+    padding:22px;
+    background:rgba(59,50,42,.5);
+    backdrop-filter:blur(3px);
+    animation:fade .2s ease both;
   }
+  .modal-backdrop[hidden]{display:none}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{
+    width:min(400px,100%);
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-radius:22px;
+    padding:30px 26px 24px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    animation:pop .28s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(.9) translateY(8px)}to{opacity:1;transform:none}}
+  .modal-emoji{font-size:34px;line-height:1;margin-bottom:14px}
+  .modal h3{
+    font-family:var(--display); font-weight:500;
+    font-size:24px; letter-spacing:-.01em; line-height:1.2;
+    margin:0 0 10px;
+  }
+  .modal p{
+    margin:0 0 24px; color:var(--ink-soft);
+    font-size:17px; line-height:1.55;
+  }
+  .modal-actions{display:flex;gap:10px}
+  .modal-actions .btn{flex:1;justify-content:center;text-align:center}
 
   @media (max-width:560px){
     body{font-size:18px}
-    .wrap{padding:42px 20px 80px}
-    .reply{padding-left:18px;margin-top:44px}
+    .wrap{padding:38px 20px 76px}
+    .reply{padding:17px;margin-top:40px}
+    .chip{font-size:12.5px;padding:6px 12px 6px 8px}
   }
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
@@ -243,7 +351,9 @@
 </head>
 <body>
 
-<nav class="rail" id="rail" aria-label="Progress"></nav>
+<nav class="chapters" aria-label="Chapters">
+  <div class="chapters-inner" id="rail"></div>
+</nav>
 
 <div class="wrap">
 
@@ -362,6 +472,18 @@
 
 </div>
 
+<div class="modal-backdrop" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-emoji" aria-hidden="true">✍️</div>
+    <h3 id="modal-title">Before you go on</h3>
+    <p>Make sure you have fully answered the last messages before moving to the next.</p>
+    <div class="modal-actions">
+      <button class="btn" id="modal-back" type="button">Go back</button>
+      <button class="btn primary" id="modal-continue" type="button">Continue</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -377,10 +499,25 @@
   var index = document.getElementById("index");
   var current = 0;
 
+  // Short labels for the always-visible chapter list up top.
+  var SHORT = { dream:"My dream", you:"You", instagram:"Instagram", money:"Money", suite:"La suite" };
+  var LOCK_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  var CHECK_SVG = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+
   var store = {
     get: function(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } },
     set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
   };
+
+  // How far she has unlocked. Chapter 1 is open from the start; each chapter
+  // opens the next only after she confirms the reminder. Persisted so
+  // returning keeps her place.
+  var unlocked = (function(){
+    var n = parseInt(store.get("ks-unlocked"), 10);
+    return (n >= 1 && n <= LAST) ? n : 1;
+  })();
+  function unlock(step){ if (step > unlocked){ unlocked = step; store.set("ks-unlocked", String(step)); } }
+  function canAccess(step){ return step === 0 || step <= unlocked; }
 
   // A per-tab id so edit events from different devices/sessions stay separable.
   var SESSION = (function(){
@@ -403,32 +540,20 @@
     return { pos: s, del: a.slice(s, ea), ins: b.slice(s, eb) };
   }
 
-  // Sends one batch of edit events. Never carries what the page displays —
+  // Sends one batch of edit events. Never carries what the page displays --
   // this is the private replay log, written to its own insert-only table.
   function flushKeystrokes(ta){
     if (!ta._buf || !ta._buf.length) return;
     clearTimeout(ta._kt); ta._kt = null;
     var batch = ta._buf; ta._buf = [];
-    var row = {
-      section: ta._sid,
-      session_id: SESSION,
-      seq: ta._seq++,
-      events: batch,
-      value_after: ta.value
-    };
+    var row = { section: ta._sid, session_id: SESSION, seq: ta._seq++, events: batch, value_after: ta.value };
     fetch(SUPABASE_URL + "/rest/v1/keystrokes", {
       method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: "Bearer " + SUPABASE_KEY,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal"
-      },
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify(row),
       keepalive: true
     }).catch(function(){
-      // Put the events back so a dropped batch is retried on the next flush.
-      ta._buf = batch.concat(ta._buf);
+      ta._buf = batch.concat(ta._buf);   // dropped batch is retried on the next flush
       ta._seq--;
     });
   }
@@ -437,18 +562,10 @@
   function saveRemote(id, title, body){
     return fetch(SUPABASE_URL + "/rest/v1/reponses", {
       method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: "Bearer " + SUPABASE_KEY,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal"
-      },
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ kind: "section", section: id, section_title: title, content: body }),
       keepalive: true
-    }).then(function(res){
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return true;
-    });
+    }).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return true; });
   }
 
   // The view returns only the most recent version of each answer.
@@ -471,18 +588,21 @@
       .catch(function(){ /* offline: the local copy already showing is fine */ });
   }
 
+  // --- cover table of contents (full titles) ---
   letters.forEach(function(sheet, i){
+    var id = sheet.dataset.id;
     var li = document.createElement("li");
     li.innerHTML =
-      '<button type="button" data-go="' + (i+1) + '">' +
+      '<button type="button" id="idx-' + id + '" data-go="' + (i+1) + '">' +
         '<span class="n">0' + (i+1) + '</span>' +
         '<span class="t"></span>' +
-        '<span class="tick" id="tick-' + sheet.dataset.id + '">answered</span>' +
+        '<span class="idxmark" id="idxmark-' + id + '"></span>' +
       "</button>";
     li.querySelector(".t").textContent = sheet.dataset.title;
     index.appendChild(li);
   });
 
+  // --- reply box under each chapter ---
   letters.forEach(function(sheet){
     var id = sheet.dataset.id, title = sheet.dataset.title, key = "ans-" + id;
 
@@ -490,7 +610,7 @@
     panel.className = "reply";
     panel.innerHTML =
       '<div class="reply-head">' +
-        '<span class="reply-label">Your reply</span>' +
+        '<span class="reply-label"><svg class="heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.3l-1.4-1.3C5.4 14.4 2 11.3 2 7.5 2 5 4 3 6.5 3c1.7 0 3.3.8 4.3 2.1L12 6.2l1.2-1.1C14.2 3.8 15.8 3 17.5 3 20 3 22 5 22 7.5c0 3.8-3.4 6.9-8.6 11.5L12 20.3z"/></svg>Your reply</span>' +
         '<span class="status" id="st-' + id + '"></span>' +
       "</div>" +
       '<textarea id="ta-' + id + '" placeholder="Take your time."></textarea>';
@@ -503,8 +623,6 @@
     ta._lastSent = ta.value;
     ta._dirty = false;
 
-    // Keystroke-log state: id for the row, the last value we diffed against,
-    // an event buffer, a per-session sequence, and its flush timer.
     ta._sid = id;
     ta._prev = ta.value;
     ta._buf = [];
@@ -524,11 +642,9 @@
       var body = ta.value;
       if (body === ta._lastSent) return;
       ta._lastSent = body;
-      st.textContent = "Saving\u2026";
+      st.textContent = "Saving…";
       st.className = "status show";
-      saveRemote(id, title, body).then(function(){
-        flash("Saved");
-      }).catch(function(){
+      saveRemote(id, title, body).then(function(){ flash("Saved"); }).catch(function(){
         ta._lastSent = null;
         flash("Saved on this device", true);
       });
@@ -538,16 +654,9 @@
       ta._dirty = true;
       store.set(key, ta.value);
 
-      // Record what changed since the last event as one edit.
       var d = diff(ta._prev, ta.value);
       if (d){
-        ta._buf.push({
-          ts: Date.now(),
-          t: (e && e.inputType) || null,
-          pos: d.pos,
-          ins: d.ins,
-          del: d.del
-        });
+        ta._buf.push({ ts: Date.now(), t: (e && e.inputType) || null, pos: d.pos, ins: d.ins, del: d.del });
         ta._prev = ta.value;
         if (ta._buf.length >= 40) flushKeystrokes(ta);
         else if (!ta._kt) ta._kt = setTimeout(function(){ flushKeystrokes(ta); }, 2500);
@@ -563,20 +672,34 @@
 
   function answered(id){ return store.get("ans-" + id).trim().length > 0; }
 
+  // --- always-visible chapter list + cover index state ---
   function paint(){
     rail.innerHTML = "";
     letters.forEach(function(sheet, i){
-      var step = i + 1;
+      var step = i + 1, id = sheet.dataset.id;
+      var locked = !canAccess(step);
+      var here = step === current;
+      var done = !locked && answered(id);
+
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "seg" + (step === current ? " here" : (answered(sheet.dataset.id) ? " done" : ""));
-      b.title = sheet.dataset.title;
-      b.setAttribute("aria-label", "Go to " + sheet.dataset.title);
-      b.addEventListener("click", function(){ go(step); });
+      b.className = "chip" + (here ? " here" : "") + (done ? " done" : "") + (locked ? " locked" : "");
+      if (locked) b.disabled = true;
+      var badge = locked ? LOCK_SVG : (done && !here ? CHECK_SVG : ("0" + step));
+      b.innerHTML = '<span class="badge">' + badge + '</span><span class="lbl"></span>';
+      b.querySelector(".lbl").textContent = SHORT[id] || sheet.dataset.title;
+      b.setAttribute("aria-label", (locked ? "Locked, read the earlier messages first: " : "Go to ") + sheet.dataset.title);
+      if (here) b.setAttribute("aria-current", "step");
+      if (!locked) b.addEventListener("click", function(){ requestGo(step); });
       rail.appendChild(b);
 
-      var tick = document.getElementById("tick-" + sheet.dataset.id);
-      if (tick) tick.className = "tick" + (answered(sheet.dataset.id) ? " on" : "");
+      // mirror the state in the cover contents list
+      var idxBtn = document.getElementById("idx-" + id);
+      if (idxBtn){
+        idxBtn.disabled = locked;
+        var mark = document.getElementById("idxmark-" + id);
+        if (mark){ mark.textContent = locked ? "🔒" : (answered(id) ? "✓" : ""); mark.className = "idxmark" + (answered(id) && !locked ? " ok" : ""); }
+      }
     });
   }
 
@@ -620,15 +743,59 @@
     window.scrollTo(0, 0);
   }
 
+  // Direct navigation (cover, chips, back, table of contents): only to
+  // somewhere already unlocked.
+  function requestGo(step){ if (canAccess(step)) go(step); }
+
+  // --- reminder modal, shown the first time she moves on from each chapter ---
+  var modal = document.getElementById("modal");
+  var pendingTarget = null;
+  function openModal(target){
+    pendingTarget = target;
+    modal.hidden = false;
+    try { document.body.style.overflow = "hidden"; } catch(e){}
+    document.getElementById("modal-continue").focus();
+  }
+  function closeModal(){
+    modal.hidden = true;
+    pendingTarget = null;
+    try { document.body.style.overflow = ""; } catch(e){}
+  }
+  document.getElementById("modal-continue").addEventListener("click", function(){
+    var target = pendingTarget;
+    closeModal();
+    if (target != null){ unlock(target); go(target); }
+  });
+  document.getElementById("modal-back").addEventListener("click", closeModal);
+  modal.addEventListener("click", function(e){ if (e.target === modal) closeModal(); });
+
+  // Forward navigation (Next / Finish / right arrow): the first time it leads
+  // to a locked chapter, ask her to make sure she has answered.
+  function attemptForward(){
+    if (current < 1 || current >= LAST) return;    // only from a chapter
+    var target = current + 1;
+    if (canAccess(target)) go(target);             // already been here: no reminder
+    else openModal(target);
+  }
+
   document.addEventListener("click", function(e){
-    var t = e.target.closest("[data-go]");
-    if (t) go(Number(t.getAttribute("data-go")));
+    var g = e.target.closest("[data-go]");
+    if (g){ requestGo(Number(g.getAttribute("data-go"))); return; }
+    var a = e.target.closest("[data-adv]");
+    if (a){ attemptForward(); }
   });
 
   document.addEventListener("keydown", function(e){
-    if (e.target.tagName === "TEXTAREA") return;
-    if (e.key === "ArrowRight" && current < LAST) go(current + 1);
-    if (e.key === "ArrowLeft" && current > 0) go(current - 1);
+    if (!modal.hidden){
+      if (e.key === "Escape") closeModal();
+      return;
+    }
+    if (e.target && e.target.tagName === "TEXTAREA") return;
+    if (e.key === "ArrowRight"){
+      if (current === 0) requestGo(1);
+      else attemptForward();
+    }
+    if (e.key === "ArrowLeft" && current > 0) requestGo(current - 1);
   });
 
   function flushCurrent(){
@@ -640,6 +807,8 @@
     if (document.visibilityState === "hidden") flushCurrent();
   });
 
+  // Back / Next row under each chapter. Next carries data-adv so it goes
+  // through the reminder gate; Back is plain data-go.
   sheets.forEach(function(sheet, i){
     if (i === 0 || i === LAST) return;
     var nav = document.createElement("div");
@@ -647,7 +816,7 @@
     nav.innerHTML =
       (i > 1 ? '<button class="btn" data-go="' + (i-1) + '">Back</button>' : "") +
       '<div class="spacer"></div>' +
-      '<button class="btn primary" data-go="' + (i+1) + '">' + (i === LAST-1 ? "Finish" : "Next") + "</button>";
+      '<button class="btn primary" data-adv="1">' + (i === LAST-1 ? "Finish" : "Next") + "</button>";
     sheet.appendChild(nav);
   });
 
