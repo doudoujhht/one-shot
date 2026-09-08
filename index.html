@@ -270,6 +270,30 @@
   textarea::placeholder{color:var(--ink-faint);font-style:italic}
   textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-wash)}
 
+  .reply-foot{
+    display:flex; align-items:center; gap:12px;
+    margin-top:14px; padding-top:14px;
+    border-top:1px dashed var(--line);
+  }
+  .send-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--sans); font-size:14.5px; font-weight:800;
+    padding:11px 20px; border-radius:999px; cursor:pointer;
+    border:1.5px solid var(--accent); background:var(--accent); color:#fff;
+    transition:background .2s ease, border-color .2s ease, transform .12s ease, opacity .2s ease;
+  }
+  .send-btn:hover:not(:disabled){background:var(--accent-deep);border-color:var(--accent-deep)}
+  .send-btn:active:not(:disabled){transform:scale(.97)}
+  .send-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .send-btn:disabled{cursor:default}
+  .send-btn.sent{
+    background:var(--good-wash); border-color:color-mix(in srgb, var(--good) 45%, var(--line));
+    color:var(--good);
+  }
+  .send-btn .ico{width:15px;height:15px;flex:none}
+  .send-note{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink-faint)}
+  .send-note.warn{color:var(--accent-deep)}
+
   .nav{
     display:flex; gap:10px; align-items:center;
     margin-top:42px; padding-top:26px;
@@ -595,6 +619,17 @@
     }).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return true; });
   }
 
+  // Send: she marks this version as her final answer. Stored as kind="final",
+  // separate from the autosaved drafts, so the one she chose stands out.
+  function sendFinal(id, title, body){
+    return fetch(SUPABASE_URL + "/rest/v1/reponses", {
+      method: "POST",
+      headers: { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ kind: "final", section: id, section_title: title, content: body }),
+      keepalive: true
+    }).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return true; });
+  }
+
   // The view returns only the most recent version of each answer.
   function loadRemote(){
     return fetch(SUPABASE_URL + "/rest/v1/latest_answers?select=section,content", { headers: HEADERS })
@@ -609,6 +644,7 @@
           ta._prev = body;               // resync so the next edit diffs cleanly
           store.set("ans-" + row.section, body);
         });
+        letters.forEach(function(s){ if (s._refreshSend) s._refreshSend(); });
         paint();
         if (current === LAST) buildRecap();
       })
@@ -640,15 +676,56 @@
         '<span class="reply-label"><svg class="heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.3l-1.4-1.3C5.4 14.4 2 11.3 2 7.5 2 5 4 3 6.5 3c1.7 0 3.3.8 4.3 2.1L12 6.2l1.2-1.1C14.2 3.8 15.8 3 17.5 3 20 3 22 5 22 7.5c0 3.8-3.4 6.9-8.6 11.5L12 20.3z"/></svg>Your reply</span>' +
         '<span class="status" id="st-' + id + '"></span>' +
       "</div>" +
-      '<textarea id="ta-' + id + '" placeholder="Take your time."></textarea>';
+      '<textarea id="ta-' + id + '" placeholder="Take your time."></textarea>' +
+      '<div class="reply-foot">' +
+        '<button class="send-btn" id="send-' + id + '" type="button">Send this version</button>' +
+        '<span class="send-note" id="sn-' + id + '"></span>' +
+      "</div>";
     sheet.appendChild(panel);
 
     var ta = panel.querySelector("textarea");
     var st = panel.querySelector(".status");
+    var sendBtn = panel.querySelector(".send-btn");
+    var sendNote = panel.querySelector(".send-note");
+    var CHECK = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
     ta.setAttribute("aria-label", "Your reply to " + title);
     ta.value = store.get(key);
     ta._lastSent = ta.value;
     ta._dirty = false;
+    var sentText = store.get("sent-" + id) || null;   // what she last sent, per device
+
+    function refreshSend(){
+      var cur = ta.value;
+      if (!cur.trim()){
+        sendBtn.disabled = true; sendBtn.className = "send-btn"; sendBtn.textContent = "Send this version";
+        sendNote.textContent = ""; sendNote.className = "send-note";
+      } else if (sentText === null){
+        sendBtn.disabled = false; sendBtn.className = "send-btn"; sendBtn.textContent = "Send this version";
+        sendNote.textContent = ""; sendNote.className = "send-note";
+      } else if (cur === sentText){
+        sendBtn.disabled = true; sendBtn.className = "send-btn sent"; sendBtn.innerHTML = CHECK + "Sent";
+        sendNote.textContent = "this is the answer you sent"; sendNote.className = "send-note";
+      } else {
+        sendBtn.disabled = false; sendBtn.className = "send-btn"; sendBtn.textContent = "Send update";
+        sendNote.textContent = "edited since you last sent"; sendNote.className = "send-note warn";
+      }
+    }
+    sheet._refreshSend = refreshSend;
+
+    sendBtn.addEventListener("click", function(){
+      var body = ta.value;
+      if (!body.trim() || body === sentText) return;
+      clearTimeout(timer); push(); flushKeystrokes(ta);   // make sure the draft + log are current too
+      sendBtn.disabled = true; sendBtn.className = "send-btn"; sendBtn.textContent = "Sending…";
+      sendFinal(id, title, body).then(function(){
+        sentText = body;
+        store.set("sent-" + id, body);
+        refreshSend();
+      }).catch(function(){
+        sendNote.textContent = "couldn't send — try again"; sendNote.className = "send-note warn";
+        refreshSend();
+      });
+    });
 
     ta._sid = id;
     ta._prev = ta.value;
@@ -690,11 +767,13 @@
       }
 
       paint();
+      refreshSend();
       clearTimeout(timer);
       timer = setTimeout(push, 1800);
     });
     ta.addEventListener("blur", function(){ clearTimeout(timer); push(); flushKeystrokes(ta); });
     sheet._flush = function(){ clearTimeout(timer); push(); flushKeystrokes(ta); };
+    refreshSend();
   });
 
   function answered(id){ return store.get("ans-" + id).trim().length > 0; }
